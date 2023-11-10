@@ -24,20 +24,17 @@ public class RegisterService {
         this.authorityRepository = authorityRepository;
         this.passwordEncoder = passwordEncoder;
     }
-    //make insert operations to user and authority tables succeed together or fail together
-    //add the duplication check and throw UserAlreadyExistException
+
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void add(User user, UserRole role) throws UserAlreadyExistException {
-        if(userRepository.existsById(user.getUsername())) {
+        if (userRepository.existsById(user.getUsername())) {
             throw new UserAlreadyExistException("User already exists");
         }
-        userRepository.save(user);
-        authorityRepository.save(new Authority(user.getUsername(),role.name()));
-        //use passwordEncoder to do the encryption
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setEnabled(true);
+        userRepository.save(user);
+        authorityRepository.save(new Authority(user.getUsername(), role.name()));
     }
-
-
-
 }
+

@@ -13,6 +13,7 @@ public class Authority implements Serializable {
     @Id
     private String username;
     private String authority;
+
     public Authority() {}
 
     public Authority(String username, String authority) {
@@ -33,5 +34,9 @@ public class Authority implements Serializable {
         return authority;
     }
 
+    public Authority setAuthority(String authority) {
+        this.authority = authority;
+        return this;
+    }
 
 }
