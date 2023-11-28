@@ -23,7 +23,7 @@ public class AuthenticationController {
         return authenticationService.authenticate(user, UserRole.ROLE_GUEST);
     }
 
-    @PostMapping("/authenticate/host")
+    @PostMapping("/authenticate/driver")
     public Token authenticateHost(@RequestBody User user) {
         return authenticationService.authenticate(user, UserRole.ROLE_DRIVER);
     }

@@ -1,5 +1,7 @@
 package com.cs362.tuffyride.controller;
 
+import com.cs362.tuffyride.exception.GCSUploadException;
+import com.cs362.tuffyride.exception.RideNotExistException;
 import com.cs362.tuffyride.exception.UserAlreadyExistException;
 import com.cs362.tuffyride.exception.UserNotExistException;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,14 @@ public class CustomExceptionHandler {
     @ExceptionHandler(UserNotExistException.class)
     public final ResponseEntity<String> handleUserNotExistExceptions(Exception ex, WebRequest request) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+    @ExceptionHandler(RideNotExistException.class)
+    public final ResponseEntity<String> handleRideNotExistExceptions(Exception ex, WebRequest request) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(GCSUploadException.class)
+    public final ResponseEntity<String> handleGCSUploadExceptions(Exception ex, WebRequest request) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
