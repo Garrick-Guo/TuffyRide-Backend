@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
 
 
@@ -20,15 +21,14 @@ public class RideController {
     }
 
     @GetMapping(value = "/rides")
-    public List<Ride> listRides(@RequestParam(name = "driver") String driverName) {
-        return rideService.listByUser(driverName);
+    public List<Ride> listRides(Principal principal) {
+        return rideService.listByUser(principal.getName());
     }
 
-    @GetMapping(value = "/rides/id")
-    public Ride getStay(
-            @RequestParam(name = "ride_id") Long rideId,
-            @RequestParam(name = "driver") String driverName) {
-        return rideService.findByIdAndDriver(rideId, driverName);
+    @GetMapping(value = "/rides/{rideId}")
+    public Ride getRide(
+            @PathVariable Long rideId, Principal principal) {
+        return rideService.findByIdAndDriver(rideId, principal.getName());
     }
 
     @PostMapping("/rides")
@@ -39,21 +39,21 @@ public class RideController {
         @RequestParam("description") String description,
         @RequestParam("driver") String driver,
         @RequestParam("guest_number") int guestNumber,
-        @RequestParam("images") MultipartFile[] images){
+        @RequestParam("images") MultipartFile[] images,
+        Principal principal){
             Ride ride = new Ride.Builder().setName(name)
                     .setPickUp(pickUp)
                     .setDropOff(dropOff)
                     .setDescription(description)
                     .setGuestNumber(guestNumber)
-                    .setDriver(new User.Builder().setUsername(driver).build())
+                    .setDriver(new User.Builder().setUsername(principal.getName()).build())
                     .build();
             rideService.add(ride, images);
     }
 
-    @DeleteMapping("/rides")
-    public void deleteStay(
-            @RequestParam(name = "ride_id") Long rideId,
-            @RequestParam(name = "driver") String driverName) {
-        rideService.delete(rideId, driverName);
+    @DeleteMapping("/rides/{rideId}")
+    public void deleteRide(
+            @PathVariable Long rideId, Principal principal) {
+        rideService.delete(rideId, principal.getName());
     }
 }
