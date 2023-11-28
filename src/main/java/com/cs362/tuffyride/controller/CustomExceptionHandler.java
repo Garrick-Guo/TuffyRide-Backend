@@ -1,9 +1,6 @@
 package com.cs362.tuffyride.controller;
 
-import com.cs362.tuffyride.exception.GCSUploadException;
-import com.cs362.tuffyride.exception.RideNotExistException;
-import com.cs362.tuffyride.exception.UserAlreadyExistException;
-import com.cs362.tuffyride.exception.UserNotExistException;
+import com.cs362.tuffyride.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -27,6 +24,10 @@ public class CustomExceptionHandler {
     @ExceptionHandler(GCSUploadException.class)
     public final ResponseEntity<String> handleGCSUploadExceptions(Exception ex, WebRequest request) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    @ExceptionHandler(InvalidSearchDateException.class)
+    public final ResponseEntity<String> handleInvalidSearchDateExceptions(Exception ex, WebRequest request) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
 

@@ -12,4 +12,5 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     List<Ride> findByDriver(User user);
 
     Ride findByIdAndDriver(Long id, User driver);
+    List<Ride> findByIdInAndGuestNumberGreaterThanEqual(List<Long> ids, int guestNumber);
 }
