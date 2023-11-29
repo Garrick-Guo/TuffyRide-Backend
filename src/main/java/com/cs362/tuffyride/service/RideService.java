@@ -1,9 +1,11 @@
 package com.cs362.tuffyride.service;
 
 import com.cs362.tuffyride.exception.RideNotExistException;
+import com.cs362.tuffyride.model.Location;
 import com.cs362.tuffyride.model.Ride;
 import com.cs362.tuffyride.model.RideImage;
 import com.cs362.tuffyride.model.User;
+import com.cs362.tuffyride.repository.LocationRepository;
 import com.cs362.tuffyride.repository.RideRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,11 +24,15 @@ import java.util.stream.Collectors;
 public class RideService {
     private RideRepository rideRepository;
     private ImageStorageService imageStorageService;
+    private LocationRepository locationRepository;
+    private GeoCodingService geoCodingService;
 
     @Autowired
-    public RideService(RideRepository rideRepository, ImageStorageService imageStorageService) {
+    public RideService(RideRepository rideRepository, ImageStorageService imageStorageService, LocationRepository locationRepository, GeoCodingService geoCodingService) {
         this.rideRepository = rideRepository;
         this.imageStorageService = imageStorageService;
+        this.locationRepository = locationRepository;
+        this.geoCodingService = geoCodingService;
     }
 
     public List<Ride> listByUser(String username) {
@@ -49,6 +55,9 @@ public class RideService {
         }
         ride.setImages(rideImages);
         rideRepository.save(ride);
+
+        Location location = geoCodingService.getLatLng(ride.getId(), ride.getPickUp());
+        locationRepository.save(location);
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)

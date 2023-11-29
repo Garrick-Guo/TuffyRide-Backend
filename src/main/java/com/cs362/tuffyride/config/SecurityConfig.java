@@ -32,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/authenticate/*").permitAll()
                 .antMatchers("/rides").hasAuthority("ROLE_DRIVER")
                 .antMatchers("/rides/*").hasAuthority("ROLE_DRIVER")
+                .antMatchers("/search").hasAuthority("ROLE_GUEST")
                 .anyRequest().authenticated()
                 .and()
                 .csrf()
