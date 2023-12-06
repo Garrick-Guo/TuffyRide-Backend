@@ -1,7 +1,9 @@
 package com.cs362.tuffyride.controller;
 
+import com.cs362.tuffyride.model.Reservation;
 import com.cs362.tuffyride.model.Ride;
 import com.cs362.tuffyride.model.User;
+import com.cs362.tuffyride.service.ReservationService;
 import com.cs362.tuffyride.service.RideService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +16,12 @@ import java.util.List;
 @RestController
 public class RideController {
     private RideService rideService;
+    private ReservationService reservationService;
 
     @Autowired
-    public RideController(RideService rideService) {
+    public RideController(RideService rideService, ReservationService reservationService) {
         this.rideService = rideService;
+        this.reservationService = reservationService;
     }
 
     @GetMapping(value = "/rides")
@@ -56,4 +60,9 @@ public class RideController {
             @PathVariable Long rideId, Principal principal) {
         rideService.delete(rideId, principal.getName());
     }
+    @GetMapping(value = "/rides/reservations/{rideId}")
+    public List<Reservation> listReservations(@PathVariable Long rideId) {
+        return reservationService.listByRide(rideId);
+    }
+
 }

@@ -1,12 +1,12 @@
 package com.cs362.tuffyride.service;
 
+import com.cs362.tuffyride.exception.RideDeleteException;
 import com.cs362.tuffyride.exception.RideNotExistException;
-import com.cs362.tuffyride.model.Location;
-import com.cs362.tuffyride.model.Ride;
-import com.cs362.tuffyride.model.RideImage;
-import com.cs362.tuffyride.model.User;
+import com.cs362.tuffyride.model.*;
 import com.cs362.tuffyride.repository.LocationRepository;
+import com.cs362.tuffyride.repository.ReservationRepository;
 import com.cs362.tuffyride.repository.RideRepository;
+import com.cs362.tuffyride.repository.RideReservationDateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -26,14 +26,20 @@ public class RideService {
     private ImageStorageService imageStorageService;
     private LocationRepository locationRepository;
     private GeoCodingService geoCodingService;
+    private ReservationRepository reservationRepository;
+    private RideReservationDateRepository rideReservationDateRepository;
+
 
     @Autowired
-    public RideService(RideRepository rideRepository, ImageStorageService imageStorageService, LocationRepository locationRepository, GeoCodingService geoCodingService) {
+    public RideService(RideRepository rideRepository, LocationRepository locationRepository, ReservationRepository reservationRepository, ImageStorageService imageStorageService, GeoCodingService geoCodingService, RideReservationDateRepository rideReservationDateRepository) {
         this.rideRepository = rideRepository;
-        this.imageStorageService = imageStorageService;
         this.locationRepository = locationRepository;
+        this.reservationRepository = reservationRepository;
+        this.imageStorageService = imageStorageService;
         this.geoCodingService = geoCodingService;
+        this.rideReservationDateRepository = rideReservationDateRepository;
     }
+
 
     public List<Ride> listByUser(String username) {
         return rideRepository.findByDriver(new User.Builder().setUsername(username).build());
@@ -66,6 +72,17 @@ public class RideService {
         if (ride == null) {
             throw new RideNotExistException("Stay doesn't exist");
         }
+        List<Reservation> reservations = reservationRepository.findByRideAndCheckoutDateAfter(ride, LocalDate.now());
+        if (reservations != null && reservations.size() > 0) {
+            throw new RideDeleteException("Cannot delete stay with active reservation");
+        }
+
+        List<RideReservedDate> rideReservedDates = rideReservationDateRepository.findByRide(ride);
+
+        for(RideReservedDate date : rideReservedDates) {
+            rideReservationDateRepository.deleteById(date.getId());
+        }
+
         rideRepository.deleteById(rideId);
     }
 }
